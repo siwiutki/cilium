@@ -1184,6 +1184,10 @@ const (
 
 	// EnableK8sNetworkPolicy enables support for K8s NetworkPolicy.
 	EnableK8sNetworkPolicy = "enable-k8s-networkpolicy"
+
+	// HubbleMetricsPodDeletionGracefulPeriod controls the delay for Hubble metrics between registering pod deletion
+	// and processing pod deletion. Pod deletion deletes Hubble metrics associated with that pod.
+	HubbleMetricsPodDeletionGracefulPeriod = "hubble-metrics-pod-deletion-graceful-period"
 )
 
 // Default string arguments
@@ -2418,6 +2422,10 @@ type DaemonConfig struct {
 
 	// EnableK8sNetworkPolicy enables support for K8s NetworkPolicy.
 	EnableK8sNetworkPolicy bool
+
+	// HubbleMetricsPodDeletionGracefulPeriod controls the delay for Hubble metrics between registering pod deletion
+	// and processing pod deletion. Pod deletion deletes Hubble metrics associated with that pod.
+	HubbleMetricsPodDeletionGracefulPeriod time.Duration
 }
 
 var (
@@ -2464,10 +2472,11 @@ var (
 		K8sEnableLeasesFallbackDiscovery: defaults.K8sEnableLeasesFallbackDiscovery,
 		APIRateLimit:                     make(map[string]string),
 
-		ExternalClusterIP:      defaults.ExternalClusterIP,
-		EnableVTEP:             defaults.EnableVTEP,
-		EnableBGPControlPlane:  defaults.EnableBGPControlPlane,
-		EnableK8sNetworkPolicy: defaults.EnableK8sNetworkPolicy,
+		ExternalClusterIP:                      defaults.ExternalClusterIP,
+		EnableVTEP:                             defaults.EnableVTEP,
+		EnableBGPControlPlane:                  defaults.EnableBGPControlPlane,
+		EnableK8sNetworkPolicy:                 defaults.EnableK8sNetworkPolicy,
+		HubbleMetricsPodDeletionGracefulPeriod: defaults.HubbleMetricsPodDeletionGracefulPeriod,
 	}
 )
 
@@ -3164,6 +3173,7 @@ func (c *DaemonConfig) Populate(vp *viper.Viper) {
 	c.EnablePMTUDiscovery = vp.GetBool(EnablePMTUDiscovery)
 	c.IPv6NAT46x64CIDR = defaults.IPv6NAT46x64CIDR
 	c.IPAMCiliumNodeUpdateRate = vp.GetDuration(IPAMCiliumNodeUpdateRate)
+	c.HubbleMetricsPodDeletionGracefulPeriod = vp.GetDuration(HubbleMetricsPodDeletionGracefulPeriod)
 
 	c.populateLoadBalancerSettings(vp)
 	c.populateDevices(vp)

@@ -541,6 +541,10 @@ const (
 
 	// EnableK8sNetworkPolicy enables support for K8s NetworkPolicy.
 	EnableK8sNetworkPolicy = true
+
+	// HubbleMetricsPodDeletionGracefulPeriod controls the delay for Hubble metrics between registering pod deletion
+	// and processing pod deletion. Pod deletion deletes Hubble metrics associated with that pod.
+	HubbleMetricsPodDeletionGracefulPeriod = 1 * time.Minute
 )
 
 var (
