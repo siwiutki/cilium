@@ -16,6 +16,7 @@ CHECK("xdp", "ratelimit") int test_ratelimit(void)
 	};
 	struct ratelimit_key key = {
 		.netdev_idx = 1,
+		.id = 0,
 	};
 	struct ratelimit_value *value;
 

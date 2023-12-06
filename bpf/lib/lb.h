@@ -1918,7 +1918,9 @@ int __tail_no_service_ipv6(struct __ctx_buff *ctx)
 	union macaddr dmac = {};
 	struct in6_addr saddr;
 	struct in6_addr daddr;
-	struct ratelimit_key rkey = {};
+	struct ratelimit_key rkey = {
+		.id = RATELIMIT_ID_ICMPV6
+	};
 	/* Rate limit to 100 ICMPv6 replies per second, burstable to 1000 responses/s */
 	struct ratelimit_settings settings = {
 		.bucket_size = 1000,

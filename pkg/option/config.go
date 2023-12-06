@@ -690,6 +690,17 @@ const (
 	// IPv6MCastDevice is the name of the option to select IPv6 multicast device
 	IPv6MCastDevice = "ipv6-mcast-device"
 
+	// BPFEventsMapRateLimit specifies the limit of messages per second that can be written to
+	// BPF events map. The number of messages is averaged, meaning that if no messages were written
+	// to the map over 5 seconds, it's possible to write more events in the 6th second.
+	// If 0 or not specified, no limit is imposed.
+	BPFEventsMapRateLimit = "bpf-events-map-rate-limit"
+
+	// BPFEventsMapBurstLimit specifies the maximum number of messages that can be written
+	// to BPF events map in 1 second. Burst limit is not imposed if rate limit is not set.
+	// By default (if 0 or not specified), it's 3 times the value of BPFEventsMapRateLimit.
+	BPFEventsMapBurstLimit uint32
+
 	// FQDNRejectResponseCode is the name for the option for dns-proxy reject response code
 	FQDNRejectResponseCode = "tofqdns-dns-reject-response-code"
 
@@ -1547,6 +1558,17 @@ type DaemonConfig struct {
 	// aggregation ensures reports are generated for when monitor-aggragation
 	// is enabled. Network byte-order.
 	MonitorAggregationFlags uint16
+
+	// BPFEventsMapRateLimit specifies the limit of messages per second that can be written to
+	// BPF events map. The number of messages is averaged, meaning that if no messages were written
+	// to the map over 5 seconds, it's possible to write more events in the 6th second.
+	// If 0 or not specified, no limit is imposed.
+	BPFEventsMapRateLimit uint32
+
+	// BPFEventsMapBurstLimit specifies the maximum number of messages that can be written
+	// to BPF events map in 1 second.
+	// By default (if 0 or not specified), it's 3 times the value of BPFEventsMapRateLimit.
+	BPFEventsMapBurstLimit uint32
 
 	// BPFMapsDynamicSizeRatio is ratio of total system memory to use for
 	// dynamic sizing of the CT, NAT, Neighbor and SockRevNAT BPF maps.
@@ -3360,6 +3382,12 @@ func (c *DaemonConfig) Populate(vp *viper.Viper) {
 		log.Fatalf("unable to parse %s: %s", LogOpt, err)
 	} else {
 		c.LogOpt = m
+	}
+
+	c.BPFEventsMapRateLimit = vp.GetInt(BPFEventsMapRateLimit)
+	c.BPFEventsMapBurstLimit = vp.GetInt(BPFEventsMapBurstLimit)
+	if c.BPFEventsMapRateLimit > 0 && c.BPFEventsMapBurstLimit == 0 {
+		c.BPFEventsMapBurstLimit = 3 * c.BPFEventsMapRateLimit
 	}
 
 	c.bpfMapEventConfigs = make(BPFEventBufferConfigs)

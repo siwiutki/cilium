@@ -9,6 +9,7 @@
 
 struct ratelimit_key {
 	__u32 netdev_idx;
+        __u32 id;
 };
 
 struct ratelimit_value {
@@ -25,7 +26,7 @@ struct {
 } RATELIMIT_MAP __section_maps_btf;
 
 struct ratelimit_settings {
-	/* A bucket will never have more than X amount of tokens, limits burt size */
+	/* A bucket will never have more than X amount of tokens, limits burst size */
 	__u64 bucket_size;
 	/* The amount of tokens added to a bucket for every topup */
 	__u64 tokens_per_topup;

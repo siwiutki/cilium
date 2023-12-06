@@ -60,8 +60,21 @@ int __send_drop_notify(struct __ctx_buff *ctx)
 	__u16 line = (__u16)(meta4 >> 16);
 	__u8 file = (__u8)(meta4 >> 8);
 	__u8 exitcode = (__u8)meta4;
-	struct drop_notify msg;
 
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0)
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return exitcode;
+	}
+
+	struct drop_notify msg;
 	msg = (typeof(msg)) {
 		__notify_common_hdr(CILIUM_NOTIFY_DROP, (__u8)error),
 		__notify_pktcap_hdr(ctx_len, (__u16)cap_len),

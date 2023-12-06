@@ -80,6 +80,19 @@ send_trace_sock_notify4(struct __ctx_sock *ctx,
 			enum xlate_point xlate_point,
 			__u32 dst_ip, __u16 dst_port)
 {
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0) {
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return
+	}
+
 	__u64 cgroup_id = 0;
 	struct trace_sock_notify msg __align_stack_8;
 
@@ -106,6 +119,19 @@ send_trace_sock_notify6(struct __ctx_sock *ctx,
 			union v6addr *dst_addr,
 			__u16 dst_port)
 {
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0) {
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return
+	}
+
 	__u64 cgroup_id = 0;
 	struct trace_sock_notify msg __align_stack_8;
 

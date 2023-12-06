@@ -189,13 +189,26 @@ send_trace_notify(struct __ctx_buff *ctx, enum trace_point obs_point,
 	__u64 ctx_len = ctx_full_len(ctx);
 	__u64 cap_len = min_t(__u64, monitor ? : TRACE_PAYLOAD_LEN,
 			      ctx_len);
-	struct trace_notify msg __align_stack_8;
 
 	update_trace_metrics(ctx, obs_point, reason);
 
 	if (!emit_trace_notify(obs_point, monitor))
 		return;
 
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0)
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return
+	}
+
+	struct trace_notify msg __align_stack_8;
 	msg = (typeof(msg)) {
 		__notify_common_hdr(CILIUM_NOTIFY_TRACE, obs_point),
 		__notify_pktcap_hdr(ctx_len, (__u16)cap_len),
@@ -220,13 +233,26 @@ send_trace_notify4(struct __ctx_buff *ctx, enum trace_point obs_point,
 	__u64 ctx_len = ctx_full_len(ctx);
 	__u64 cap_len = min_t(__u64, monitor ? : TRACE_PAYLOAD_LEN,
 			      ctx_len);
-	struct trace_notify msg;
 
 	update_trace_metrics(ctx, obs_point, reason);
 
 	if (!emit_trace_notify(obs_point, monitor))
 		return;
 
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0)
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return
+	}
+
+	struct trace_notify msg __align_stack_8;
 	msg = (typeof(msg)) {
 		__notify_common_hdr(CILIUM_NOTIFY_TRACE, obs_point),
 		__notify_pktcap_hdr(ctx_len, (__u16)cap_len),
@@ -253,13 +279,26 @@ send_trace_notify6(struct __ctx_buff *ctx, enum trace_point obs_point,
 	__u64 ctx_len = ctx_full_len(ctx);
 	__u64 cap_len = min_t(__u64, monitor ? : TRACE_PAYLOAD_LEN,
 			      ctx_len);
-	struct trace_notify msg;
 
 	update_trace_metrics(ctx, obs_point, reason);
 
 	if (!emit_trace_notify(obs_point, monitor))
 		return;
 
+	if (is_defined(EVENTS_MAP_RATE_LIMIT_PER_SECOND) && EVENTS_MAP_RATE_LIMIT_PER_SECOND > 0)
+		struct ratelimit_key rkey = {
+			.id = RATELIMIT_ID_EVENTS_MAP,
+		};
+		struct ratelimit_settings settings = {
+			.bucket_size = EVENTS_MAP_RATE_LIMIT_PER_SECOND * 5,
+			.tokens_per_topup = EVENTS_MAP_BURST_LIMIT,
+			.topup_interval_ns = NSEC_PER_SEC,
+		};
+		if (!ratelimit_check_and_take(&rkey, &settings))
+			return
+	}
+
+	struct trace_notify msg __align_stack_8;
 	msg = (typeof(msg)) {
 		__notify_common_hdr(CILIUM_NOTIFY_TRACE, obs_point),
 		__notify_pktcap_hdr(ctx_len, (__u16)cap_len),
